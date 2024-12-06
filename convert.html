@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Tách Email</title>
+        <style>
+            #loading {
+                display: none;
+                font-size: 18px;
+                color: #007bff;
+                margin: 10px 0;
+            }
+
+            #result {
+                margin-top: 10px;
+                max-height: 200px;
+                max-width: screen;
+                border: 1px solid #ccc;
+                padding: 10px;
+                overflow-y: auto;
+                background-color: #f9f9f9;
+                position: relative;
+            }
+
+            #result div {
+                padding: 5px 0;
+                border-bottom: 1px solid #eee;
+            }
+
+            #result div:last-child {
+                border-bottom: none;
+            }
+
+            #copyButton {
+                margin-top: 10px;
+                padding: 5px 10px;
+                background-color: #007bff;
+                color: #fff;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+
+            #copyButton:hover {
+                background-color: #0056b3;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Tách Email từ Dữ Liệu</h1>
+        <textarea
+            id="dataInput"
+            rows="10"
+            cols="50"
+            placeholder="Nhập dữ liệu tại đây..."
+        ></textarea>
+        <br />
+        <button onclick="extractEmails()">Tách Email</button>
+        <h2>Kết quả:</h2>
+        <div id="loading">Đang xử lý, vui lòng chờ...</div>
+        <div id="result"></div>
+        <button
+            id="copyButton"
+            onclick="copyToClipboard()"
+            style="display: none"
+        >
+            Copy
+        </button>
+
+        <script>
+            function extractEmails() {
+                const inputData = document.getElementById("dataInput").value;
+                const lines = inputData.split("\n");
+                const resultContainer = document.getElementById("result");
+                const loadingIndicator = document.getElementById("loading");
+                const copyButton = document.getElementById("copyButton");
+                loadingIndicator.style.display = "block";
+                resultContainer.innerHTML = "";
+
+                setTimeout(() => {
+                    let hasEmail = false;
+
+                    lines.forEach((line) => {
+                        const email = line.split(":")[0];
+                        if (email) {
+                            hasEmail = true;
+                            const div = document.createElement("div");
+                            div.textContent = email.trim();
+                            resultContainer.appendChild(div);
+                        }
+                    });
+
+                    if (hasEmail) {
+                        copyButton.style.display = "inline-block";
+                    } else {
+                        copyButton.style.display = "none";
+                    }
+
+                    loadingIndicator.style.display = "none";
+                }, 1000);
+            }
+
+            function copyToClipboard() {
+                const resultContainer = document.getElementById("result");
+                const copyButton = document.getElementById("copyButton");
+                const emails = Array.from(resultContainer.children)
+                    .map((div) => div.textContent)
+                    .join("\n");
+                navigator.clipboard
+                    .writeText(emails)
+                    .then(() => {
+                        alert("Đã sao chép vào clipboard!");
+                    })
+                    .catch((err) => {
+                        alert("Sao chép thất bại: " + err);
+                    });
+            }
+        </script>
+    </body>
+</html>
